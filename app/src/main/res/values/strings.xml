@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">智能洗手间</string>
+    <string name="sex">性别</string>
+    <string name="btn_check">查看</string>
+    <string name="status">状态</string>
+    <string name="item_bind_dev">设备绑定</string>
+    <string name="btn_bind_dev">绑定</string>
+    <string name="text_dev_id">设备ID</string>
+</resources>
