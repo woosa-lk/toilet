@@ -1,7 +1,6 @@
 package com.woosa.toilet;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,19 +8,16 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.woosa.toilet.MainActivity.*;
-
-public class LayoutAdapter extends BaseAdapter {
+public class MainAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private List<Map<String,Object>> item_list;
-    Context activity;
+    private Context activity;
 
-    public LayoutAdapter(List<Map<String,Object>> list,Context context){
+    public MainAdapter(List<Map<String,Object>> list,Context context){
         this.mInflater = LayoutInflater.from(context);
         item_list = list;
         activity = context;

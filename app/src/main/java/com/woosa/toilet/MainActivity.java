@@ -35,7 +35,8 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements IGetMessageCallBack{
     private List<Map<String, Object>> list = new ArrayList<>();
-    private LayoutAdapter adapter;
+    private MainAdapter adapter;
+
     private Intent serviceIntent;
     private MessageReceiver messageReceiver;
     private IntentFilter intentFilter;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements IGetMessageCallBa
 
         //view init
         ListView listView = findViewById(R.id.main_list);
-        adapter = new LayoutAdapter(list, this);
+        adapter = new MainAdapter(list, this);
         listView.setAdapter(adapter);
 
         //mqtt service
@@ -68,6 +69,15 @@ public class MainActivity extends AppCompatActivity implements IGetMessageCallBa
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        serviceConnection = new MyServiceConnection();
+        serviceConnection.setIGetMessageCallBack(MainActivity.this);
+        final Intent intent = new Intent(this, MQTTService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService(serviceConnection);
@@ -75,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements IGetMessageCallBa
     }
 
     //service binder
-
     private void get_system_device_status()
     {
         Parcel data=Parcel.obtain();
@@ -158,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements IGetMessageCallBa
 
     @Override
     public void setMessage(String message) throws JSONException {
-        Log.e("set Message recv:", message);
+        Log.e("Main Message recv:", message);
         JSONObject cmd = new JSONObject(message);
         switch (cmd.getString("cmd")) {
             case "MQTT_CONNECT_SUCCESS":
@@ -208,10 +217,11 @@ public class MainActivity extends AppCompatActivity implements IGetMessageCallBa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.scan_dev:
-                //Intent intent_list=new Intent();
-                //intent_list.setClass(MainActivity.this, DeviceStatusActivity.class);
+                Intent intent_list=new Intent();
+                intent_list.setClass(MainActivity.this, DeviceActivity.class);
                 //intent_list.putExtra("Context", (Parcelable) MainActivity.this);
-                //startActivity(intent_list);
+                startActivity(intent_list);
+                get_system_bind_dev();
                 break;
             default:
                 break;

@@ -3,6 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/scan_dev"
-        android:title="@string/item_bind_dev"
+        android:title="@string/activity_dev"
         app:showAsAction="ifRoom" />
 </menu>
