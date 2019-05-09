@@ -10,6 +10,8 @@ import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.json.JSONArray;
@@ -22,28 +24,32 @@ import java.util.List;
 import java.util.Map;
 
 public class DeviceActivity extends AppCompatActivity implements IGetMessageCallBack{
-    List<Map<String, Object>> list_dev = new ArrayList<>();
+    List<DeviceData> list_dev = new ArrayList<>();
     private DeviceAdapter adapter;
 
     private DeviceActivity.MyServiceConnection serviceConnection;
     private IBinder binder;
+
+    private final static int REQUEST_CODE = 101;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
         setTitle(R.string.activity_dev);
 
-        ListView listView = findViewById(R.id.device_list);
-        adapter = new DeviceAdapter(list_dev, this);
-        listView.setAdapter(adapter);
-
         //mqtt service
         serviceConnection = new MyServiceConnection();
         serviceConnection.setIGetMessageCallBack(DeviceActivity.this);
         final Intent intent = new Intent(this, MQTTService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+
+        ListView listView = findViewById(R.id.device_list);
+        adapter = new DeviceAdapter(list_dev, DeviceActivity.this);
+        listView.setAdapter(adapter);
     }
 
+    //get init data.
     private void get_system_bind_dev()
     {
         Parcel data=Parcel.obtain();
@@ -62,14 +68,16 @@ public class DeviceActivity extends AppCompatActivity implements IGetMessageCall
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.e("Device activity:","Service Connected.");
             binder = iBinder;
             mqttService = ((MQTTService.CustomBinder)iBinder).getService();
             mqttService.setIGetMessageCallBack(IGetMessageCallBack);
+            get_system_bind_dev();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-
+            Log.e("Device activity:","Service Connected.");
         }
 
         public void setIGetMessageCallBack(IGetMessageCallBack IGetMessageCallBack){
@@ -82,24 +90,31 @@ public class DeviceActivity extends AppCompatActivity implements IGetMessageCall
         Log.e("Device Message recv:", message);
         JSONObject cmd = new JSONObject(message);
         switch (cmd.getString("cmd")) {
-            case "MQTT_CONNECT_SUCCESS":
-
-                break;
             case "CMD_RET_INIT_DATA":
                 list_dev.clear();
-                Map map;
+                DeviceData item;
                 JSONArray dev_id = cmd.getJSONArray("dev_id");
                 for (int dev_num = 0; dev_num < dev_id.length(); dev_num++) {
-                    //JSONObject msg = dev_id.getJSONObject(dev_num);
-                    map = new HashMap<String,Object>();
-                    map.put("text_dev_id", dev_id.get(dev_num));
-                    list_dev.add(map);
+                    item = new DeviceData((String) dev_id.get(dev_num), R.drawable.bind);
+                    list_dev.add(item);
                 }
                 adapter.notifyDataSetChanged();
                 break;
-            case "CMD_RET_SYS_INIT_DATA":
-                break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e("Device :","onResume");
+        if (serviceConnection !=null)
+        {
+            unbindService(serviceConnection);
+        }
+        serviceConnection = new DeviceActivity.MyServiceConnection();
+        serviceConnection.setIGetMessageCallBack(DeviceActivity.this);
+        final Intent intent = new Intent(this, MQTTService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -108,12 +123,12 @@ public class DeviceActivity extends AppCompatActivity implements IGetMessageCall
         Log.e("Device message", "onPause");
     }
 
-    /** 当活动不再可见时调用 */
     @Override
     protected void onStop() {
         super.onStop();
         Log.e("Device message", "onStop");
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

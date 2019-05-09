@@ -1,7 +1,9 @@
 package com.woosa.toilet;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +20,13 @@ import java.util.Map;
 
 import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
-public class DeviceAdapter extends BaseAdapter {
+public class DeviceAdapter extends BaseAdapter{
     private final static int REQUEST_CODE = 101;
     private LayoutInflater mInflater;
-    private List<Map<String,Object>> item_list = new ArrayList<>();;
-    private Context activity;
+    private List<DeviceData> item_list = new ArrayList<>();;
+    public Context activity;
 
-    public DeviceAdapter(List<Map<String,Object>> list, Context context){
+    public DeviceAdapter(List<DeviceData> list, Context context){
         this.mInflater = LayoutInflater.from(context);
         item_list = list;
         activity = context;
@@ -54,6 +56,7 @@ public class DeviceAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
+        //DeviceData device_data = (DeviceData) getItem(position);
         DeviceAdapter.ViewHolder holder = null;
 
         if (convertView == null) {
@@ -70,7 +73,7 @@ public class DeviceAdapter extends BaseAdapter {
             holder = (DeviceAdapter.ViewHolder)convertView.getTag();
         }
 
-        holder.fruitDevID.setText((String)item_list.get(position).get("text_dev_id"));
+        holder.fruitDevID.setText(item_list.get(position).getText());
         holder.fruitLayout.setTag(position);
 
         holder.fruitBtn.setOnClickListener(new viewButtonClickListener(position));
@@ -89,10 +92,14 @@ public class DeviceAdapter extends BaseAdapter {
             item_list.get(position).toString();
             Intent intent_list=new Intent();
             intent_list.setClass(activity, BindDevActivity.class);
-            intent_list.putExtra("dev_id", item_list.get(position).toString());
-            Log.e("DEV_ID:",item_list.get(position).toString());
+            intent_list.putExtra("dev_id", item_list.get(position).getText());
             intent_list.putExtra("pos_id", position);
             activity.startActivity(intent_list);
+            //((Activity)activity.getApplicationContext()).startActivityForResult(intent_list, REQUEST_CODE);
+
+            //remove item.
+            //item_list.remove(position);
+            //notifyDataSetChanged();
         }
     }
 }

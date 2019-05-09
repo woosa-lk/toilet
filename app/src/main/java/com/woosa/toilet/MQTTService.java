@@ -45,7 +45,7 @@ public class MQTTService extends Service {
     //binder
     private IGetMessageCallBack IGetMessageCallBack;
 
-    //msg
+    //broadcast msg
     public static final String SERVER_DATA = "data";
     public static final String ACTION_INIT_DATA = "toilet.com.MQTTService.INIT_DATA_ACTION";
     public final Intent serverDataIntent = new Intent();
@@ -182,7 +182,7 @@ public class MQTTService extends Service {
             if (IGetMessageCallBack != null){
                 IGetMessageCallBack.setMessage(str_msg);
             }
-            serverDataIntent.putExtra(SERVER_DATA, str_msg);
+            serverDataIntent.putExtra(serverDataIntent.EXTRA_TEXT, str_msg);
             sendBroadcast(serverDataIntent);
         }
 

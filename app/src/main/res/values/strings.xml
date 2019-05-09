@@ -12,6 +12,10 @@
         <item>2F</item>
         <item>3F</item>
         <item>4F</item>
+        <item>5F</item>
+        <item>6F</item>
+        <item>7F</item>
+        <item>8F</item>
     </string-array>
     <string-array name="bind_sex">
         <item>man</item>
